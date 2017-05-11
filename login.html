@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Admin</title>
+		<style>
+		  * { margin: 0; padding: 0; box-sizing: border-box; }
+		  body { font: 13px Helvetica, Arial; }
+		  form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+		  form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+		  form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+		  .messages { list-style-type: none; margin: 0; padding: 0; }
+		  .messages li { padding: 5px 10px; }
+		  .messages li:nth-child(odd) { background: #eee; }
+		  .messages { margin-bottom: 40px }
+		</style>
+    </head>
+    <body>
+        <div id="login">
+            <p id="info">connecting to server...</p>
+            <div id="nickname">
+                <input type="text" placeHolder="nickname" id="nicknameInput" />
+                <button id ='nickname_btn'>OK</button>
+            </div>
+        </div>
+        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+		<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+		<script>
+      		$(function () {
+				var admin=io();			
+				$("#nickname_btn" ).click(function(){
+					admin.emit('admin');	
+					$('#login').remove();
+				});
+				
+				admin.on('dialog', function(client, msg){
+					if($('body').find('#'+ client).length == 0) {
+						var chat = $("<iframe id=" + client + " src='http://localhost:3000'></iframe>");
+						$('body').append(chat);
+						$('#' + client).on("load",function(){
+							var message = $('#' + client).contents().find(".messages").get(0);
+							$(message).append($('<li>').text(msg));
+							window.scrollTo(0, document.body.scrollHeight);
+						 });				
+					} else {
+						var message = $('#' + client).contents().find(".messages").get(0);
+						$(message).append($('<li>').text(msg));
+						window.scrollTo(0, document.body.scrollHeight);
+					}
+        		});
+      		});
+		</script>
+    </body>
+</html>
